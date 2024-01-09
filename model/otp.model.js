@@ -6,11 +6,11 @@ const OTPSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    OTP: {
+    otp: {
         type: String,
         required: true
     },
-    timer: {
+    time: {
         type: Date,
         required: true
     }
