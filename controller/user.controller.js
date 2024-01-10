@@ -2,11 +2,28 @@ const User = require('../model/user.model');
 const { sendOTP, verifyOTP } = require('../services/message');
 const OTP = require('../model/otp.model');
 
+exports.createUser = async (req, res) => {
+    try {
+
+        const newUser = new User(req.body);
+        const savedUser = await newUser.save();
+
+        res.status(200).json({
+            message: "success",
+            data: savedUser
+        })
+
+    } catch (error) {
+        res.status(400).json({ message: error.message })
+    }
+}
+
 exports.otpSend = async (req, res) => {
     try {
-        const { phone } = req.body;
 
-        const otpRequest = await sendOTP(phone)
+        const user = await User.findById(req.body.id).select('-_id phone')
+
+        const otpRequest = await sendOTP(user.phone)
 
         res.status(201).json(otpRequest);
 
@@ -18,27 +35,23 @@ exports.otpSend = async (req, res) => {
 exports.verifyOtp = async (req, res) => {
     try {
 
-        const { otp, phone } = req.body
+        const { id, otp } = req.body
 
-        const verifyOtp = await verifyOTP(phone, otp)
+        const user = await User.findById(id).select('-_id phone')
+
+        const verifyOtp = await verifyOTP(user.phone, otp)
 
         if (verifyOtp) {
-            const newUser = new User(req.body);
-            const savedUser = await newUser.save();
-
             const newOtp = new OTP({
-                user: savedUser._id,
+                user: id,
                 otp: otp,
             })
-
             const savedOtp = await newOtp.save()
             res.status(200).json({
                 message: true,
-                data: savedUser,
                 otpData: savedOtp
             })
         }
-
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
