@@ -52,6 +52,9 @@ exports.verifyOtp = async (req, res) => {
                 otpData: savedOtp
             })
         }
+        else {
+            res.status(400).json({ message: "error" });
+        }
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
