@@ -21,7 +21,7 @@ exports.createUser = async (req, res) => {
 exports.otpSend = async (req, res) => {
     try {
 
-        const user = await User.findById(req.body.id).select('-_id phone')
+        const user = await getUserPhone(req.body.id)
 
         const otpRequest = await sendOTP(user.phone)
 
@@ -37,7 +37,7 @@ exports.verifyOtp = async (req, res) => {
 
         const { id, otp } = req.body
 
-        const user = await User.findById(id).select('-_id phone')
+        const user = await getUserPhone(id)
 
         const verifyOtp = await verifyOTP(user.phone, otp)
 
@@ -68,3 +68,7 @@ exports.listUser = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+const getUserPhone = async (id) => {
+    return await User.findById(id).select('-_id phone')
+}
