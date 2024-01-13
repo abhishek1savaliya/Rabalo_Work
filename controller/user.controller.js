@@ -1,6 +1,7 @@
 const User = require('../model/user.model');
 const { sendOTP, verifyOTP } = require('../services/message');
 const OTP = require('../model/otp.model');
+const { sendMail } = require('../services/mail');
 
 exports.createUser = async (req, res) => {
     try {
@@ -72,6 +73,15 @@ exports.listUser = async (req, res) => {
     }
 };
 
+exports.mail = async (req, res) => {
+    try {
+        const messageId = await sendMail(req.body.mail);
+        res.json({ success: true, messageId });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
 const getUserPhone = async (id) => {
     return await User.findById(id).select('-_id phone')
 }
